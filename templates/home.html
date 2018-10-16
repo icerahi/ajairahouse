@@ -1,0 +1,33 @@
+{% extends 'layout.html' %}
+{% block content %}
+
+
+{% if active %}
+
+
+{% else %}
+{% block nav %}
+<li class="active"><a href="{{url_for('home')}}">Home</a></li>
+<li><a href="{{url_for('contest')}}" >Contest</a></li>
+<li><a href="{{url_for('upload')}}">Upload</a></li>
+<li class="profile" ><a href="{{url_for('profile')}}"><img  src="{{url_for('static',filename='img/demo-doll.png')}}" alt="" />Profile</a></li>
+
+ {% endblock %}
+
+
+{% endif %}
+
+
+<div class="container">
+
+  <!-- Main component for a primary marketing message or call to action -->
+  <div class="jumbotron">
+    <h1>Post Example</h1>
+
+    <img src="{{url_for('static',filename='img/demo-doll.png')}}"
+
+  </div>
+
+</div>
+
+{% endblock %}
