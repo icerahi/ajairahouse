@@ -27,14 +27,47 @@
 
             {{ registrationform.hidden_tag() }}
 
+
             {{ registrationform.username.label() }}
-            {{ registrationform.username(class='form-control',placeholder='username') }}
+      {% if registrationform.username.errors %}
+            {{ registrationform.username(class='form-control form-control-lg is-invalid') }}
+            <div class="invalid-feedback">
+            {% for error in registrationform.username.errors %}
+            <span>{{ error }}</span>
+            {% endfor %}
+          </div>
+          {% else %}
+          {{ registrationform.username(class='form-control',placeholder='username') }}
+
+      {% endif %}
+
 
             {{ registrationform.email.label() }}
-            {{ registrationform.email(class='form-control',placeholder='Email') }}
+            {% if registrationform.email.errors %}
+            {{ registrationform.email(class='form-control form-control-lg is-invalid') }}
+            <div class="invalid-feedback">
+              {% for error in registrationform.email.errors %}
+              <span>{{ error }}</span>
+              {% endfor %}
+              <div>
+              {% else %}
+              {{ registrationform.email(class='form-control',placeholder='Email') }}
+            {% endif %}
+
 
             {{ registrationform.password.label() }}
-            {{ registrationform.password(class='form-control',placeholder='password') }}
+
+              {% if registrationform.password.errors %}
+                        {{ registrationform.password(class='form-control form-control-lg is-invalid') }}
+                        <div class="invalid-feedback">
+                          {% for error in registrationform.password.errors %}
+                          <span>{{ error }}</span>
+                          {% endfor %}
+                          <div>
+                          {% else %}
+                          {{ registrationform.password(class='form-control',placeholder='password') }}
+                        {% endif %}
+
 
             <div class="checkbox">
               <label for="usercheck">

@@ -1,0 +1,35 @@
+.navbar-color{
+	
+	border-bottom:1px solid #F3F3F3;
+}
+.navbar-color a{
+	color:#8F8B89 !important;
+	font-size:15px;
+	font-family:tahoma;
+	font-weight:bold;
+}
+.navbar-color a.active{
+	color:#494849 !important;
+}
+.profile img{
+	width:25px;
+	height:20px;
+	float:left;
+	margin-top:8px;
+	background-color:#EFEFEF
+}
+.profile .nav-item{
+	float:left;
+}
+@media only screen and (max-width: 450px) {
+	.navbar-brand{
+		width:100%;
+		display:block;
+		overflow:hidden;
+	}
+	.navbar-nav{
+		width:100%;
+		display:block;
+		overflow:hidden;
+	}
+}

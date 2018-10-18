@@ -1,12 +1,18 @@
-<!DOCTYPE html>
-<html lang="en" dir="ltr">
-  <head>
-    <meta charset="utf-8">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-    <link rel="stylesheet" href="{{url_for('static',filename='part.css')}}">
-    <title>AjairaHouse-login</title>
-  </head>
-  <body>
+{% extends 'layout.html' %}
+
+{% block login %}
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+<link rel="stylesheet" href="{{url_for('static',filename='part.css')}}">
+{% endblock %}
+
+{% block content %}
+{% with messages=get_flashed_messages(with_categories=true) %}
+{% for category,message in messages %}
+<div class="alert alert-{{ category }}">
+  {{ message }}
+</div>
+{% endfor %}
+{% endwith %}
 
 
     </nav>
@@ -27,20 +33,41 @@
           <form class="form-group" action="" method="POST">
             {{ loginform.hidden_tag() }}
 
-            {{ loginform.email.label()}}
-            {{ loginform.email(class='form-control',placeholder='Email') }}
-
+            {{ loginform.email.label() }}
+            {% if loginform.email.errors %}
+            {{ loginform.email(class='form-control form-control-lg is-invalid') }}
+            <div class="invalid-feedback">
+              {% for error in loginform.email.errors %}
+              <span>{{ error }}</span>
+              {% endfor %}
+              <div>
+              {% else %}
+              {{ loginform.email(class='form-control',placeholder='Email') }}
+            {% endif %}
 
             {{ loginform.password.label() }}
-            {{ loginform.password(class='form-control',placeholder='Password') }}
+            {% if loginform.password.errors %}
+                      {{ loginform.password(class='form-control form-control-lg is-invalid') }}
+                      <div class="invalid-feedback">
+                        {% for error in loginform.password.errors %}
+                        <span>{{ error }}</span>
+                        {% endfor %}
+                        <div>
+                        {% else %}
+                        {{ loginform.password(class='form-control',placeholder='password') }}
+                      {% endif %}
 
-            <div class="checkbox">
-              <label for="usercheck">
-                <input type="checkbox" name="usercheck" value="">
+            <div class="form-check">
+              {{ loginform.remember(class="form-check-input") }}
+              {{ loginform.remember.label(class="form-check-label") }}
 
-                Keep Me Logged In</label>
+
             </div>
               {{ loginform.submit(class='btn btn-default') }}
+              <small>
+                <a href="#">&nbsp;&nbsp;Forgot Password?</a>
+              </small>
+              <br><br>
             <small class='text-muted'>
               Need An Account? Then <a class='ml-2' href='{{url_for('register')}}'>Register</a>
 
@@ -50,5 +77,4 @@
 
       </div>
     </div>
-  </body>
-</html>
+ {% endblock %}
