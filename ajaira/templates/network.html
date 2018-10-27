@@ -27,7 +27,8 @@
                         <div class="row">
                             <div class="col-lg-4 col-md-4 col-12">
                               {% for usr in user %}
-                                <div class="profile-image float-md-right"> <img src="https://bootdey.com/img/Content/avatar/avatar7.png" alt=""> </div>
+                              
+                                <div class="profile-image float-md-right"> <img src="{{url_for('static',filename='img/'+usr.image_file)}}" alt=""> </div>
                             </div>
 
                                 <h4 class="m-t-0 m-b-0"><strong>{{ usr.username }}</strong></h4>

@@ -1,8 +1,11 @@
-from flask import Flask,render_template,url_for,flash,redirect,request
+from flask import Flask,render_template,url_for,flash,redirect,request,abort
 from ajaira import app,db,bcrypt,login_manager
-from ajaira.form import RegistrationForm,LoginForm,UpdateForm
+from ajaira.form import RegistrationForm,LoginForm,UpdateForm,PostForm
 from ajaira.models import User,Post
 from flask_login import login_user,current_user,logout_user,login_required
+import secrets
+import os
+from PIL import Image
 
 active=True
 
@@ -11,18 +14,30 @@ active=True
 @app.route("/home")
 @login_required
 def home():
-    return render_template("home.html",active=active)
+    posts=Post.query.all()
+    return render_template("home.html",posts=posts,active=active)
 
 @app.route("/contest")
 @login_required
 def contest():
     user=User.query.all()
-    return render_template("network.html",active=active,user=user)
 
-@app.route("/upload")
-@login_required
-def upload():
-    return render_template("upload.html",active=active)
+    return render_template("network.html",active=active,user=user )
+
+
+def save_picture(form_picture):
+    random_hex=secrets.token_hex(8)
+    _, f_ext=os.path.splitext(form_picture.filename)
+    picture_fn=random_hex+f_ext
+    picture_path=os.path.join(app.root_path,"static/img",picture_fn)
+    form_picture.save(picture_path)
+
+    output_size = (125, 125)
+    i = Image.open(form_picture)
+    i.thumbnail(output_size)
+    i.save(picture_path)
+    return picture_fn
+
 
 
 @app.route("/profile", methods=['GET', 'POST'])
@@ -30,7 +45,9 @@ def upload():
 def profile():
     form = UpdateForm()
     if form.validate_on_submit():
-
+        if form.picture.data:
+            picture_file=save_picture(form.picture.data)
+            current_user.image_file=picture_file
         current_user.username = form.username.data
         current_user.email = form.email.data
         db.session.commit()
@@ -41,6 +58,7 @@ def profile():
         form.email.data = current_user.email
     image_file = url_for('static', filename='img/' + current_user.image_file)
     return render_template('profile.html', title='Account',image_file=image_file, form=form,active=active)
+
 
 
 
@@ -83,5 +101,55 @@ def register():
 def logout():
     logout_user()
     return redirect(url_for('login'))
-if __name__=="__main__":
-    app.run(debug=True)
+
+
+@app.route("/upload",methods=["GET","POST"])
+@login_required
+def upload():
+    form=PostForm()
+    if form.validate_on_submit():
+        post=Post(title=form.title.data,content=form.content.data,author=current_user)
+
+        db.session.add(post)
+        db.session.commit()
+        flash("YOur post has been created!","success")
+        return redirect(url_for('home'))
+
+    return render_template("upload.html",active=active,form=form,legend="New Post")
+
+
+@app.route("/post/<int:post_id>")
+def post(post_id):
+    post=Post.query.get_or_404(post_id)
+    return render_template('post.html',post=post,active=active)
+
+
+@app.route("/post/<int:post_id>/update",methods=["GET","POST"])
+@login_required
+def update_post(post_id):
+    post=Post.query.get_or_404(post_id)
+    if post.author != current_user:
+        abort(403)
+    form=PostForm()
+    if form.validate_on_submit():
+        post.title=form.title.data
+        post.content=form.content.data
+        db.session.commit()
+        flash("Your post has been update!","success")
+        return redirect(url_for('post',post_id=post.id))
+    elif request.method=="GET":
+        form.title.data=post.title
+        form.content.data=post.content
+    return render_template('upload.html',post=post,form=form,legend="Update post",active=active)
+
+
+@app.route("/post/<int:post_id>/delete",methods=["POST"])
+@login_required
+def delete_post(post_id):
+    post=Post.query.get_or_404(post_id)
+    if post.author != current_user:
+        abort(403)
+    db.session.delete(post)
+    db.session.commit()
+    flash("YOur post has delete successfully","success")
+    return redirect("home")

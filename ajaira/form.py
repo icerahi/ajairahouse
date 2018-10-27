@@ -1,8 +1,9 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField,PasswordField,SubmitField,BooleanField
+from wtforms import StringField,PasswordField,SubmitField,BooleanField,TextAreaField
 from wtforms.validators import DataRequired,Length,Email,ValidationError
 from ajaira.models import User,Post
 from flask_login import current_user
+from flask_wtf.file import FileField,FileAllowed
 
 class RegistrationForm(FlaskForm):
     username=StringField("Username",validators=[DataRequired(),Length(min=2)])
@@ -27,6 +28,8 @@ class LoginForm(FlaskForm):
 class UpdateForm(FlaskForm):
     username=StringField("Username",validators=[DataRequired(),Length(min=2)])
     email=StringField("Email",validators=[DataRequired(),Email()])
+    picture=FileField("Change profile",validators=[FileAllowed(["jpg","png"])])
+
 
     submit=SubmitField("Update")
 
@@ -36,3 +39,8 @@ class UpdateForm(FlaskForm):
             user=User.query.filter_by(email=email.data).first()
             if user:
                 raise ValidationError("Sorry this email is Taken please Try another!")
+
+class PostForm(FlaskForm):
+    title=StringField("Title",validators=[DataRequired()])
+    content=TextAreaField("Content",validators=[DataRequired()])
+    submit=SubmitField("Post")
